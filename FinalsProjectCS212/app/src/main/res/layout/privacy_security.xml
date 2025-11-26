@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="64dp"
+    android:orientation="horizontal"
+    android:gravity="center_vertical"
+    android:background="#111C2A"
+    android:padding="12dp"
+    android:layout_marginBottom="12dp"
+    android:clipToPadding="false"
+    android:clipChildren="false"
+    android:backgroundTint="#111C2A">
+
+    <!--
+    WAG NA TO PANSININ NEED LANG NG XML PARA
+    DI MAG ERROR PALITAN NALANG UNG DRAWABLE
+    -->
+
+    <!-- Privacy Security -->
+    <ImageView
+        android:id="@+id/priv_sec"
+        android:layout_width="28dp"
+        android:layout_height="28dp"
+        android:src="@drawable/battery" /> <!-- pa change ng drawable neto-->
+
+    <TextView
+        android:id="@+id/priv_sec_text"
+        android:layout_width="0dp"
+        android:layout_height="wrap_content"
+        android:layout_weight="1"
+        android:text="Privacy and Security"
+        android:textSize="16sp"
+        android:textColor="#FFFFFF"
+        android:paddingStart="14dp" />
+
+</LinearLayout>
