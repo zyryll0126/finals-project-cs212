@@ -3,4 +3,11 @@
     <color name="black">#FF000000</color>
     <color name="white">#FFFFFFFF</color>
     <color name="_4da3ff">#4DA3FF</color>
+
+    <color name="app_background">#0E1117</color>
+    <color name="card_background">#1A2130</color>
+    <color name="text_secondary">#AAB0BC</color>
+    <color name="accent_blue">#2855C6</color>
+    <color name="tab_background">#2C303E</color>
+    <color name="nav_bar_color">#000000</color>
 </resources>
