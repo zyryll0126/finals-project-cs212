@@ -16,16 +16,18 @@ import android.view.animation.AnimationUtils;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.ImageView;
-import android.widget.ListView;
 import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.activity.result.ActivityResultLauncher;
 import androidx.activity.result.contract.ActivityResultContracts;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 import java.util.Set;
@@ -35,9 +37,8 @@ public class Dashboard extends AppCompatActivity {
     private TextView welcome, txtBikeName, txtLocation, txtKmToday, txtMinutes, txtAvgSpeed;
     private ImageView imgBike;
     private Button btnConnect;
-    private boolean isBikeConnected = false; // Initially, no bike is connected
+    private boolean isBikeConnected = false;
 
-    // Quick action buttons
     private ImageView startBikeBtn, lockBikeBtn, findBikeBtn, navigationBtn;
 
     private static final int REQUEST_BLUETOOTH_PERMISSIONS = 1;
@@ -50,7 +51,7 @@ public class Dashboard extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.dashboard);
 
-        // ===== BIND MAIN UI =====
+        // Bind views
         welcome = findViewById(R.id.welcome);
         txtBikeName = findViewById(R.id.txtBikeName);
         txtLocation = findViewById(R.id.txtLocation);
@@ -59,94 +60,120 @@ public class Dashboard extends AppCompatActivity {
         txtAvgSpeed = findViewById(R.id.txtAvgSpeed);
         imgBike = findViewById(R.id.imgBike);
         btnConnect = findViewById(R.id.btnConnect);
+        startBikeBtn = findViewById(R.id.startBikeBtn);
+        lockBikeBtn = findViewById(R.id.lockBikeBtn);
+        findBikeBtn = findViewById(R.id.findBikeBtn);
+        navigationBtn = findViewById(R.id.navigateBikeBtn);
 
-        // Example dynamic text
         welcome.setText("Welcome Back, Rider!");
-
-        // ===== BIND QUICK ACTION BUTTONS =====
-        startBikeBtn   = findViewById(R.id.startBikeBtn);
-        lockBikeBtn    = findViewById(R.id.lockBikeBtn);
-        findBikeBtn    = findViewById(R.id.findBikeBtn);
-        navigationBtn  = findViewById(R.id.navigateBikeBtn);
-
-        // ===== INITIAL UI STATE =====
         updateBikeConnectionState();
 
-        // Initialize Bluetooth adapter
         bluetoothAdapter = BluetoothAdapter.getDefaultAdapter();
 
-        // Initialize the launcher for enabling Bluetooth
         enableBluetoothLauncher = registerForActivityResult(
                 new ActivityResultContracts.StartActivityForResult(),
                 result -> {
                     if (result.getResultCode() == RESULT_OK) {
-                        // Bluetooth has been enabled
-                        scanForDevices();
+                        // Bluetooth is now enabled, proceed to scan.
+                        // The permission check is crucial here!
+                        if (checkBluetoothPermissions()) {
+                            scanForDevices();
+                        }
                     } else {
-                        // User did not enable Bluetooth
-                        Toast.makeText(this, "Bluetooth is required to connect to your bike.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(this, "Bluetooth must be enabled to connect.", Toast.LENGTH_SHORT).show();
                     }
                 });
 
-        // ===== CLICK LISTENERS =====
-        btnConnect.setOnClickListener(v -> {
-            if (checkBluetoothPermissions()) {
-                if (bluetoothAdapter == null) {
-                    Toast.makeText(this, "Bluetooth is not supported on this device.", Toast.LENGTH_SHORT).show();
-                } else if (!bluetoothAdapter.isEnabled()) {
-                    Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
-                    enableBluetoothLauncher.launch(enableBtIntent);
-                } else {
-                    scanForDevices();
-                }
+        btnConnect.setOnClickListener(v -> handleConnectionLogic());
+
+        // Action button listeners
+        addAction(startBikeBtn, () -> { /* TODO: Start Bike Action */ });
+        addAction(lockBikeBtn, () -> { /* TODO: Lock Bike Action */ });
+        addAction(findBikeBtn, () -> { /* TODO: Find Bike Action */ });
+        addAction(navigationBtn, () -> { /* TODO: Navigation Action */ });
+
+        BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
+        bottomNav.setSelectedItemId(R.id.nav_home);
+
+        bottomNav.setOnItemSelectedListener(item -> {
+            int itemId = item.getItemId();
+            if (itemId == R.id.nav_home) {
+                return true;
+            } else if (itemId == R.id.nav_status) {
+                startActivity(new Intent(getApplicationContext(), StatusActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_rides) {
+                startActivity(new Intent(getApplicationContext(), MainActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
+            } else if (itemId == R.id.nav_profile) {
+                startActivity(new Intent(getApplicationContext(), ProfileActivity.class));
+                overridePendingTransition(0, 0);
+                finish();
+                return true;
             }
+            return false;
         });
+    }
 
-        // ===== ADD CLICK ACTIONS + ANIMATION =====
-        addAction(startBikeBtn, () -> {
-            // TODO: Start Bike Action Here
-        });
+    private void handleConnectionLogic() {
+        if (bluetoothAdapter == null) {
+            Toast.makeText(this, "Bluetooth is not supported on this device.", Toast.LENGTH_SHORT).show();
+            return;
+        }
 
-        addAction(lockBikeBtn, () -> {
-            // TODO: Lock Bike Action Here
-        });
-
-        addAction(findBikeBtn, () -> {
-            // TODO: Find Bike Action Here
-        });
-
-        addAction(navigationBtn, () -> {
-            // TODO: Navigation Action Here
-        });
+        // This is the correct flow: first check permissions.
+        if (checkBluetoothPermissions()) {
+            // If permissions are granted, then check if Bluetooth is enabled.
+            if (!bluetoothAdapter.isEnabled()) {
+                Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+                enableBluetoothLauncher.launch(enableBtIntent);
+            } else {
+                // Permissions are granted and Bluetooth is on, so we can safely scan.
+                scanForDevices();
+            }
+        }
+        // If checkBluetoothPermissions() returns false, it has already requested the permissions.
+        // The logic will continue in onRequestPermissionsResult.
     }
 
     private boolean checkBluetoothPermissions() {
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            // For Android 12 and above
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_SCAN) != PackageManager.PERMISSION_GRANTED ||
                     ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_CONNECT) != PackageManager.PERMISSION_GRANTED) {
                 ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH_SCAN, Manifest.permission.BLUETOOTH_CONNECT}, REQUEST_BLUETOOTH_PERMISSIONS);
                 return false;
             }
         } else {
+            // For older versions (though ACCESS_FINE_LOCATION might still be needed for scanning)
             if (ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED ||
-                    ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN, Manifest.permission.ACCESS_FINE_LOCATION}, REQUEST_BLUETOOTH_PERMISSIONS);
+                    ContextCompat.checkSelfPermission(this, Manifest.permission.BLUETOOTH_ADMIN) != PackageManager.PERMISSION_GRANTED) {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.BLUETOOTH, Manifest.permission.BLUETOOTH_ADMIN}, REQUEST_BLUETOOTH_PERMISSIONS);
                 return false;
             }
         }
         return true;
     }
 
+    // This annotation is now safe because we guarantee the check happens before calling.
+    @SuppressLint("MissingPermission")
     private void scanForDevices() {
-        @SuppressLint("MissingPermission")
         Set<BluetoothDevice> pairedDevices = bluetoothAdapter.getBondedDevices();
         ArrayList<String> deviceList = new ArrayList<>();
         ArrayList<BluetoothDevice> devices = new ArrayList<>();
 
-        if (pairedDevices.size() > 0) {
+        if (pairedDevices != null && !pairedDevices.isEmpty()) {
             for (BluetoothDevice device : pairedDevices) {
-                deviceList.add(device.getName() + "\n" + device.getAddress());
+                String deviceName = device.getName();
+                String deviceAddress = device.getAddress();
+                if (deviceName == null || deviceName.isEmpty()) {
+                    deviceName = "Unknown Device";
+                }
+                deviceList.add(deviceName + "\n" + deviceAddress);
                 devices.add(device);
             }
         }
@@ -154,26 +181,46 @@ public class Dashboard extends AppCompatActivity {
         AlertDialog.Builder builder = new AlertDialog.Builder(this);
         builder.setTitle("Select Your Bike");
 
+        if (devices.isEmpty()) {
+            deviceList.add("No paired devices found.");
+        }
+
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, deviceList);
         builder.setAdapter(adapter, (dialog, which) -> {
-            // TODO: Connect to the selected device
-            isBikeConnected = true;
-            updateBikeConnectionState();
-            Toast.makeText(Dashboard.this, "Connected to " + devices.get(which).getName(), Toast.LENGTH_SHORT).show();
+            if (!devices.isEmpty()) {
+                BluetoothDevice selectedDevice = devices.get(which);
+                // TODO: Connect to the selected device
+                isBikeConnected = true;
+                updateBikeConnectionState();
+                String connectedDeviceName = selectedDevice.getName() != null ? selectedDevice.getName() : "Unknown Device";
+                Toast.makeText(Dashboard.this, "Connected to " + connectedDeviceName, Toast.LENGTH_SHORT).show();
+            }
         });
 
-        AlertDialog dialog = builder.create();
-        dialog.show();
+        builder.create().show();
     }
 
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         if (requestCode == REQUEST_BLUETOOTH_PERMISSIONS) {
-            if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                btnConnect.callOnClick();
+            boolean allPermissionsGranted = true;
+            if (grantResults.length > 0) {
+                for (int grantResult : grantResults) {
+                    if (grantResult != PackageManager.PERMISSION_GRANTED) {
+                        allPermissionsGranted = false;
+                        break;
+                    }
+                }
             } else {
-                Toast.makeText(this, "Bluetooth permissions are required to connect to your bike.", Toast.LENGTH_SHORT).show();
+                allPermissionsGranted = false;
+            }
+
+            if (allPermissionsGranted) {
+                // Permissions were granted, now we can re-trigger the connection logic.
+                handleConnectionLogic();
+            } else {
+                Toast.makeText(this, "Bluetooth permissions are required to connect.", Toast.LENGTH_SHORT).show();
             }
         }
     }
@@ -188,16 +235,10 @@ public class Dashboard extends AppCompatActivity {
         }
     }
 
-    // ======================================================
-    //  CLICK + BOUNCE ANIMATION FUNCTION
-    // ======================================================
     private void addAction(ImageView image, final Runnable action) {
         final Animation anim = AnimationUtils.loadAnimation(this, R.anim.click_animation);
-
         image.setOnClickListener(v -> {
             image.startAnimation(anim);
-
-            // Delay the action until animation finishes
             new Handler(Looper.getMainLooper()).postDelayed(action, 120);
         });
     }

@@ -6,105 +6,93 @@
     android:layout_height="match_parent"
     android:background="@drawable/bg_gradient">
 
-    <!-- ===== APP NAME ===== -->
-    <TextView
-        android:id="@+id/appName1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="YAMAHA"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        tools:layout_editor_absoluteY="16dp"
-        tools:ignore="MissingConstraints" />
-
-    <TextView
-        android:id="@+id/appName2"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="4dp"
-        android:text="Y-Connect"
-        android:textColor="#FFFFFF"
-        android:textSize="26sp"
-        android:textStyle="bold"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.498"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toBottomOf="@id/appName1" />
+    <!-- ===== APP LOGO ===== -->
 
     <!-- ===== SUBTITLE ===== -->
+    <ImageView
+        android:id="@+id/appLogo"
+        android:layout_width="250dp"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="32dp"
+        android:adjustViewBounds="true"
+        android:src="@drawable/retrodash_logo"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.472"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
+
     <TextView
         android:id="@+id/subTitle"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginTop="8dp"
         android:text="Connect with your Yamaha motorcycle"
         android:textColor="#B0BEC5"
         android:textSize="14sp"
-        android:layout_marginTop="4dp"
-        app:layout_constraintTop_toBottomOf="@id/appName2"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/appLogo" />
 
     <!-- ===== EMAIL ===== -->
+
+    <!-- ===== PASSWORD ===== -->
     <EditText
         android:id="@+id/emailInput"
         android:layout_width="0dp"
         android:layout_height="50dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="104dp"
         android:hint="Enter your email"
         android:padding="15dp"
         android:textColor="#FFFFFF"
         android:textColorHint="#80FFFFFF"
-        app:layout_constraintTop_toBottomOf="@id/subTitle"
-        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginHorizontal="20dp"
-        android:layout_marginTop="40dp"/>
+        app:layout_constraintHorizontal_bias="0.0"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/subTitle" />
 
-    <!-- ===== PASSWORD ===== -->
     <EditText
         android:id="@+id/passwordInput"
         android:layout_width="0dp"
         android:layout_height="50dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="15dp"
         android:hint="Enter your password"
-        android:padding="15dp"
         android:inputType="textPassword"
+        android:padding="15dp"
         android:textColor="#FFFFFF"
         android:textColorHint="#80FFFFFF"
-        android:layout_marginTop="15dp"
-        android:layout_marginHorizontal="20dp"
-        app:layout_constraintTop_toBottomOf="@id/emailInput"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/emailInput" />
 
     <!-- ===== FORGOT PASSWORD ===== -->
     <TextView
         android:id="@+id/forgotPassword"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Forgot Password?"
-        android:textSize="13sp"
-        android:textColor="#90CAF9"
         android:layout_marginTop="8dp"
-        app:layout_constraintTop_toBottomOf="@id/passwordInput"
+        android:layout_marginEnd="25dp"
+        android:text="Forgot Password?"
+        android:textColor="#90CAF9"
+        android:textSize="13sp"
         app:layout_constraintEnd_toEndOf="parent"
-        android:layout_marginEnd="25dp" />
+        app:layout_constraintTop_toBottomOf="@id/passwordInput" />
 
     <!-- ===== LOGIN BUTTON ===== -->
     <Button
         android:id="@+id/btnLogin"
         android:layout_width="0dp"
         android:layout_height="55dp"
+        android:layout_marginHorizontal="20dp"
+        android:layout_marginTop="20dp"
+        android:backgroundTint="#1E5BFF"
         android:text="Sign In"
         android:textAllCaps="false"
         android:textSize="16sp"
-        android:backgroundTint="#1E5BFF"
-        android:layout_marginTop="20dp"
-        android:layout_marginHorizontal="20dp"
-        app:layout_constraintTop_toBottomOf="@id/forgotPassword"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintEnd_toEndOf="parent" />
+        app:layout_constraintTop_toBottomOf="@id/forgotPassword" />
 
     <!-- ===== OR DIVIDER ===== -->
 
@@ -117,19 +105,20 @@
         android:id="@+id/facebook_login_button"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:visibility="gone" />
+        android:visibility="gone"
+        tools:ignore="MissingConstraints" />
 
     <!-- ===== SIGN UP LINK ===== -->
     <TextView
         android:id="@+id/signUpText"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="328dp"
         android:text="Don’t have an account? Sign up Here"
         android:textColor="#90CAF9"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintHorizontal_bias="0.54"
-        app:layout_constraintStart_toStartOf="parent" />
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@+id/btnLogin"
+        app:layout_constraintVertical_bias="0.19" />
 
 </androidx.constraintlayout.widget.ConstraintLayout>
