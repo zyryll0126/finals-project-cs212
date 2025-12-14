@@ -1,23 +1,30 @@
 package com.example.yamahay_connect;
 
+import android.content.Intent;
 import android.os.Bundle;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import java.util.ArrayList; // correct import
-import java.util.List;      // correct import
+import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity {
 
     private RecyclerView rvRides;
     private RideAdapter adapter;
     private List<RideModel> rideList;
+    private FirebaseAuth mAuth;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        mAuth = FirebaseAuth.getInstance();
 
         // Remove default action bar
         if (getSupportActionBar() != null) {
@@ -31,7 +38,7 @@ public class MainActivity extends AppCompatActivity {
         // 2. Initialize the list
         rideList = new ArrayList<>();
 
-        // 3. Add the data (This is the part giving you errors if placed incorrectly)
+        // 3. Add the data
         rideList.add(new RideModel("Today", "2:30 PM", "Home - Saint Louis University", "5.2 km", "35 min"));
         rideList.add(new RideModel("Yesterday", "8:15 AM", "Home - SM Baguio", "2 km", "28 min"));
         rideList.add(new RideModel("Nov 1", "6:00 PM", "Home - Pangasinan", "20 km", "1h 24min"));
@@ -45,5 +52,20 @@ public class MainActivity extends AppCompatActivity {
         // 5. Setup Bottom Navigation
         BottomNavigationView bottomNav = findViewById(R.id.bottomNav);
         bottomNav.setSelectedItemId(R.id.nav_rides);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        FirebaseUser currentUser = mAuth.getCurrentUser();
+        if (currentUser == null) {
+            sendToLogin();
+        }
+    }
+
+    private void sendToLogin() {
+        Intent intent = new Intent(MainActivity.this, Login.class);
+        startActivity(intent);
+        finish();
     }
 }
